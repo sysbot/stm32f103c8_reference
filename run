@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# guide from
+# [1] https://rust-embedded.github.io/book/start/qemu.html
+
+# specificially for stm32f103c8, which has the following memory configs [1][2]
+# otherwise unable to flash [3]
+# MEMORY
+# {
+#   FLASH : ORIGIN = 0x08000000, LENGTH = 128K
+#   RAM : ORIGIN = 0x20000000, LENGTH = 20K
+# }
+# [1] https://www.reddit.com/r/rust/comments/b18c51/tip_how_to_increase_default_flash_size_for/
+# [2] https://github.com/rust-embedded/docs/pull/5/files
+# [3] https://github.com/rust-embedded/book/issues/43
+
+# if memory is misconfigured for what ever reasons
+# ```
+# cargo clean
+# cargo build --target thumbv7m-none-eabi
+# ```
+
+cargo build --target thumbv7m-none-eabi
+
+cargo readobj --bin blinky -- -file-headers
+cargo size --bin blinky --release -- -A
+
+# verify using qemu
+qemu-system-arm \
+    -cpu cortex-m3 \
+    -machine lm3s6965evb \
+    -nographic \
+    -semihosting-config enable=on,target=native \
+    -kernel target/thumbv6m-none-eabi/debug/examples/hello
+
+# hardware
+# cargo build --example hello
+# echo "gdb -q target/thumbv6m-none-eabi/debug/examples/hello"
+# if there's an issue with controller [1]
+# telnet localhost 4444
+# reset halt
+# stm32f1x unlock 0
+# reset halt
+[1] https://github.com/TeXitoi/blue-pill-quickstart
+
+cargo run --example hello
