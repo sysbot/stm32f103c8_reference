@@ -33,6 +33,10 @@ qemu-system-arm \
     -semihosting-config enable=on,target=native \
     -kernel target/thumbv6m-none-eabi/debug/examples/hello
 
+# start the serial debugger
+echo "start the debugger in a seperate terminal"
+echo "openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg"
+
 # hardware
 # cargo build --example hello
 # echo "gdb -q target/thumbv6m-none-eabi/debug/examples/hello"
